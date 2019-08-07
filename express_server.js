@@ -21,6 +21,19 @@ function generateRandomString() {
 };
 
 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
 const urlDatabase = {
 
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -33,7 +46,8 @@ app.get("/urls", (req, res) => {
 }); 
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = { username: req.cookies["username"] };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -60,6 +74,16 @@ app.post("/urls", (req, res) => {
   urlDatabase[newURL] = req.body.longURL
   res.redirect(`/urls/${newURL}`);         // Respond with redirection to newURL
 });
+
+app.get("/register", (req, res) => {
+  res.render("urls_reg");
+});
+
+app.post("/register", (req, res) => {
+  let newUserID = generateRandomString();
+  users[newUserID] = newUserID
+  res.redirect("/urls");
+  })
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = `${urlDatabase[req.params.shortURL]}`;
