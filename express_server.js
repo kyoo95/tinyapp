@@ -31,6 +31,15 @@ const emailLookup = function(email, database) {
   return false;
 };
 
+const urlsForUser = function(checkShortURL, database) {
+  for (let URL in database) {
+    if (URL === checkShortURL) {
+      return database[URL].userID;
+    }
+  }
+  return false;
+}
+
 // Example users and urlDatabase
 const users = { 
   "userRandomID": {
