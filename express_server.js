@@ -105,7 +105,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
+  console.log(req.body);
   let newURL = generateRandomString();
   urlDatabase[newURL] = req.body.longURL
   res.redirect(`/urls/${newURL}`);
@@ -117,9 +117,7 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  let templateVars = { userID: req.cookies["userID"] }
-  res.cookie("userID");
-  res.render("urls_login", templateVars);
+  res.render("urls_login", {user: null});
 });
 
 app.post("/logout", (req, res) => {
@@ -130,18 +128,21 @@ app.post("/logout", (req, res) => {
 
 // LOGIN
 app.post("/login", (req, res) => {
-  if (emailLookup(req.body.email, users) === false) {
+  let userID = emailLookup(req.body.email, users);
+  if (userID === false) {
     console.log("Email not found");
     res.send("Error 403: Email not found");
   }
-  if (emailLookup(req.body.email, users)) {
-    if (users[key].password === req.body.password) {
-      console.log("Password is correct");
-      res.cookie("userID", newUserID);
-      res.redirect("urls");
+  if (userID) {
+    for (let key in users) {
+      if (users[key].password === req.body.password) {
+        console.log("Password is correct");
+        res.cookie("userID", newUserID);
+        res.redirect("urls");
     } else {
-      console.log("Password is incorrect");
-      res.send("Error 403: Password incorrect");
+        console.log("Password is incorrect");
+        res.send("Error 403: Password incorrect");
+      }
     }
   }
 });
