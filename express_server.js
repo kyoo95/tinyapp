@@ -50,17 +50,17 @@ const urlDatabase = {
 };
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase, username: req.cookies["username"], userID: req.cookies["newUserID"] };
+  let templateVars = { urls: urlDatabase, userID: req.cookies["userID"] };
   res.render("urls_index", templateVars);
 }); 
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { username: req.cookies["username"], userID: req.cookies["newUserID"] };
+  let templateVars = { userID: req.cookies["userID"] };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"], userID: req.cookies["newUserID"] };
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], userID: req.cookies["userID"] };
   res.render("urls_show", templateVars);
 });
 
@@ -85,7 +85,36 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  res.render("urls_reg");
+  let templateVars = { userID: req.cookies["userID"] }
+  res.render("urls_reg", templateVars);
+});
+
+app.get("/login", (req, res) => {
+  let templateVars = { userID: req.cookies["userID"] }
+  res.cookie("userID");
+  res.render("urls_login", templateVars);
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("userID");
+  res.redirect("/urls");
+});
+
+
+// LOGIN
+app.post("/login", (req, res) => {
+  if (emailLookup(req.body.email, users) === false) {
+    console.log("Email not found")
+    res.send("Error 403");
+  }
+  if (emailLookup(req.body.email, users)) {
+    if (req.body.password == users) {
+      res.cookie("userID", newUserID);
+      res.redirect("urls");
+    } else {
+      res.send("Error 403");
+    }
+  }
 });
 
 // REGISTRATION 
@@ -103,7 +132,7 @@ app.post("/register", (req, res) => {
     res.cookie("userID", newUserID);
     res.redirect("/urls");
   }
-  })
+});
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = `${urlDatabase[req.params.shortURL]}`;
@@ -120,15 +149,6 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   res.redirect("/urls");
 })
 
-app.post("/urls/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls");
-})
-
-app.post("/urls/logout", (req, res) => {
-  res.clearCookie("username");
-  res.redirect("/urls");
-})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
