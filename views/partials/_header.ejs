@@ -11,18 +11,16 @@
       </div>
     </div>
     <div class="topright">
-      <div class="navbar-nav">
-        <%if(userID){ %>
-        Logged in as <%=userID %>
-        <form method="POST" action="/logout">
-        <button>Logout</button>
-        </form>
-        <% } else { %>
+        <% if (!user) { %>
         <a class="nav-item nav-link" href="/login">Login</a>
-        <% } %>
         <a class="nav-item nav-link" href="/register">Register</a>
-      </div>
-     </div> 
+        <% } else { %>
+          Logged in as <%=user %>
+          <form method="POST" action="/logout">
+          <button>Logout</button>
+          </form>
+        <% } %>
+      </div> 
   </nav>
 </header>
 
