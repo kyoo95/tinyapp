@@ -1,7 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
-const cookieSession = require("cookie-session")
+const cookieSession = require("cookie-session");
+const { generateRandomString, emailLookup, urlsForUser } = require("./helpers");
 
 const app = express();
 const PORT = 8080; // default port 8080
@@ -16,35 +17,6 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 
 
-// Helper Functions
-function generateRandomString() {
-  let randomChar = '';
-  let characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  let charLength = 6;
-  for (let x = 0; x < charLength; x++) {
-    let rand = Math.floor(Math.random() * characters.length);
-    randomChar += characters.substring(rand, rand + 1);
-  }
-  return randomChar;
-};
-
-const emailLookup = function(email, database) {
-  for (let key in database) {
-    if (database[key].email === email) {
-        return database[key].id;
-    }
-  }
-  return false;
-};
-
-const urlsForUser = function(checkShortURL, database) {
-  for (let URL in database) {
-    if (URL === checkShortURL) {
-      return database[key].id;
-    }
-  }
-  return false;
-};
 
 // Example users and urlDatabase
 const users = { 
@@ -183,23 +155,13 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  let cookie = req.session.user_id
-  let urlObj = urlsForUser(urlDatabase[req.params.shortURL], users)
-  if (urlObj === cookie) {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
-  } else {
-    res.send("Error 403: You can only delete your own URL")
-  }
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
-  let cookie = req.session.user_id
-  let urlObj = urlsForUser(urlDatabase[req.params.shortURL], users)
-  if (urlObj === cookie) {
   urlDatabase[req.params.shortURL] = req.body.newURL
   res.redirect("/urls");
-  }
 });
 
 
