@@ -33,8 +33,6 @@ const users = {
 }
 
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
 
@@ -60,17 +58,21 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { 
-    user: req.session.user_id,
-    shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL], 
-  };
-  res.render("urls_show", templateVars);
+  if (req.session.used_id === urlsForUser(urlDatabase, req.params.shortURL)) {
+    let templateVars = { 
+      user: req.session.user_id,
+      shortURL: req.params.shortURL, 
+      longURL: urlDatabase[req.params.shortURL], 
+    };
+    res.render("urls_show", templateVars);
+  } else {
+    res.status(403).send("No access");
+  }
 });
 
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/login");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -134,10 +136,10 @@ app.get("register.json", (req, res) => {
 app.post("/register", (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
     console.log('Empty email/password')  
-    res.send("Error 400");
+    res.send("Error 400: No email/password filled in");
   } else if (emailLookup(req.body.email, users)) {
     console.log('Email exists')
-    res.send("Error 400");
+    res.send("Error 400: This email already exists");
   } else {
     let newUserID = generateRandomString();
     users[newUserID] = {
