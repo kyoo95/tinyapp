@@ -20,11 +20,22 @@ const emailLookup = function(email, database) {
 
 const urlsForUser = function(checkShortURL, database) {
   for (let URL in database) {
+    console.log(URL)
     if (URL === checkShortURL) {
-      return database[key].id;
+      return true;
     }
   }
   return false;
 };
 
-module.exports = { generateRandomString, emailLookup, urlsForUser }
+const getURL = function(id, database) {
+  const filteredObject = Object.keys(database)
+    .filter(key => database[key].userID === id)
+    .reduce((obj, key) => {
+      obj[key] = database[key];
+      return obj;
+    }, {});
+  return filteredObject;
+ };
+
+module.exports = { generateRandomString, emailLookup, urlsForUser, getURL }
