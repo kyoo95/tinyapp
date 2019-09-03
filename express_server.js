@@ -62,18 +62,12 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  console.log(urlDatabase)
-  console.log(req.params.shortURL)
-  if (urlsForUser(req.params.shortURL, urlDatabase)) {
     let templateVars = { 
       user: req.session.user_id,
       shortURL: req.params.shortURL, 
       longURL: urlDatabase[req.params.shortURL], 
     };
     res.render("urls_show", templateVars);
-  } else {
-    res.status(403).send("No access");
-  }
 });
 
 app.post("/urls/:shortURL", (req, res) => {
