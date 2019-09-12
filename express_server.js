@@ -92,12 +92,15 @@ app.get("/hello", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  let newURL = generateRandomString();
-  urlDatabase[newURL] = {};
-  urlDatabase[newURL].longURL = req.body.longURL;
-  urlDatabase[newURL].userID = req.session.user_id;
-  res.redirect(`/urls/${newURL}`);
+  if (req.body.longURL.includes('http://www.') || req.body.longURL.includes('https://www.')) {
+    let newURL = generateRandomString();
+    urlDatabase[newURL] = {};
+    urlDatabase[newURL].longURL = req.body.longURL;
+    urlDatabase[newURL].userID = req.session.user_id;
+    res.redirect(`/urls/${newURL}`);
+  } else {
+    res.send("Must include http://www.")
+  }
 });
 
 app.get("/register", (req, res) => {
@@ -159,7 +162,9 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = `${urlDatabase[req.params.shortURL]}`;
+  const longURL = `${urlDatabase[req.params.shortURL].longURL}`;
+  console.log(longURL)
+  console.log("^^")
   res.redirect(longURL);
 });
 
