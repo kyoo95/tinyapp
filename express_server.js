@@ -39,6 +39,9 @@ const urlDatabase = {
 
 
 app.get("/urls", (req, res) => {
+  if (!req.session.user_id) {
+    res.redirect("/login");
+  }
   const filterURLID = getURL(req.session.user_id, urlDatabase);
   let templateVars = { 
     user: users[req.session.user_id],
