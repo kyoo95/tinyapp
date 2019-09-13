@@ -65,6 +65,9 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
+  if (!req.session.user_id) {
+    res.redirect("/login");
+  }
     let templateVars = { 
       user: req.session.user_id,
       shortURL: req.params.shortURL, 
